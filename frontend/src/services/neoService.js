@@ -1,10 +1,8 @@
-import axios from "axios"
+import axios from "axios";
 
-const API_KEY = import.meta.env.VITE_NASA_API_KEY
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export async function fetchAsteroids() {
-  const res = await axios.get(
-    `https://api.nasa.gov/neo/rest/v1/neo/browse?api_key=${API_KEY}`
-  )
-  return res.data.near_earth_objects
+  const res = await axios.get(`${API_URL}/api/asteroids/threats`);
+  return res.data; 
 }
