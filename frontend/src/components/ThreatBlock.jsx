@@ -5,13 +5,13 @@ export default function ThreatBlock({ name, score, level }) {
       : level === "HIGH"
       ? "#FF6A2A"
       : level === "MEDIUM"
-      ? "#22d3ee"
+      ? "#38bdf8"
       : "#22c55e"
 
   return (
     <div className="relative w-full h-72 flex items-center justify-center">
 
-      {/* Arc */}
+      {/* ARC */}
       <svg viewBox="0 0 200 100" className="absolute w-full h-full">
         <path
           d="M10 100 A90 90 0 0 1 190 100"
@@ -23,23 +23,58 @@ export default function ThreatBlock({ name, score, level }) {
           d="M10 100 A90 90 0 0 1 190 100"
           fill="none"
           stroke={color}
-          strokeWidth="2"
+          strokeWidth="2.5"
+          strokeLinecap="round"
           strokeDasharray={`${score * 1.8} 360`}
         />
       </svg>
 
-      {/* Center */}
-      <div className="text-center">
-        <p className="text-sm text-gray-400">{name}</p>
+      {/* CENTER CONTENT */}
+      <div className="text-center flex flex-col items-center gap-3">
+
+        {/* ASTEROID NAME */}
         <p
-          className="text-4xl font-mono"
-          style={{ color }}
+          className="
+            text-sm
+            tracking-wide
+            text-gray-400
+            uppercase
+          "
+          style={{ fontFamily: "Space Grotesk, sans-serif" }}
+        >
+          {name}
+        </p>
+
+        {/* SCORE */}
+        <p
+          className="
+            text-4xl
+            font-semibold
+            tracking-tight
+          "
+          style={{
+            color,
+            fontFamily: "Space Grotesk, sans-serif",
+          }}
         >
           {score}
         </p>
+
+        {/* LEVEL BADGE */}
         <div
-          className="mt-2 px-3 py-1 text-xs border"
-          style={{ borderColor: color, color }}
+          className="
+            mt-1
+            px-4 py-1
+            text-xs
+            rounded-full
+            border
+            tracking-wider
+          "
+          style={{
+            borderColor: color,
+            color,
+            fontFamily: "Space Grotesk, sans-serif",
+          }}
         >
           {level}
         </div>

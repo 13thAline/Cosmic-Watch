@@ -2,11 +2,18 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const Navbar = ({ isLoggedIn = false }) => {
+/* ======================================================
+   NAVBAR
+   ====================================================== */
+const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
 
+  // ✅ AUTH STATE (single source of truth)
+  const isLoggedIn = Boolean(localStorage.getItem("token"));
+
+  /* ---------- SCROLL TO FEATURES ---------- */
   const scrollToFeatures = () => {
     if (location.pathname !== "/") {
       navigate("/");
@@ -14,12 +21,18 @@ const Navbar = ({ isLoggedIn = false }) => {
         document.getElementById("features")?.scrollIntoView({
           behavior: "smooth",
         });
-      }, 150);
+      }, 200);
     } else {
       document.getElementById("features")?.scrollIntoView({
         behavior: "smooth",
       });
     }
+    setOpen(false);
+  };
+
+  /* ---------- PROFILE CLICK ---------- */
+  const goToProfile = () => {
+    navigate("/dashboard");
     setOpen(false);
   };
 
@@ -53,17 +66,13 @@ const Navbar = ({ isLoggedIn = false }) => {
 
           <NavItem label="Features" onClick={scrollToFeatures} />
           <NavItem label="Threat Score" onClick={() => navigate("/threat")} />
-          <NavItem
-            label="Notifications"
-            onClick={() => navigate("/notifications")}
-          />
-          {/* New Chat NavItem */}
-          <NavItem label="Global Chat" onClick={() => navigate("/chat")} /> 
+          <NavItem label="Notifications" onClick={() => navigate("/notifications")} />
+          <NavItem label="Global Chat" onClick={() => navigate("/chat")} />
 
           <Divider />
 
           {isLoggedIn ? (
-            <ProfileIcon onClick={() => navigate("/profile")} />
+            <ProfileIcon onClick={goToProfile} />
           ) : (
             <GetStarted onClick={() => navigate("/register")} />
           )}
@@ -84,10 +93,7 @@ const Navbar = ({ isLoggedIn = false }) => {
           style={{ fontFamily: "General Sans, sans-serif" }}
         >
           <Logo />
-          <button
-            onClick={() => setOpen(true)}
-            className="text-2xl text-white"
-          >
+          <button onClick={() => setOpen(true)} className="text-2xl text-white">
             ☰
           </button>
         </div>
@@ -110,22 +116,13 @@ const Navbar = ({ isLoggedIn = false }) => {
             style={{ fontFamily: "General Sans, sans-serif" }}
           >
             <MobileItem onClick={scrollToFeatures}>Features</MobileItem>
-            <MobileItem onClick={() => navigate("/threat")}>
-              Threat Score
-            </MobileItem>
-            <MobileItem onClick={() => navigate("/notifications")}>
-              Notifications
-            </MobileItem>
-            {/* New Mobile Chat Item */}
-            <MobileItem onClick={() => navigate("/chat")}>
-              Global Chat
-            </MobileItem>
+            <MobileItem onClick={() => navigate("/threat")}>Threat Score</MobileItem>
+            <MobileItem onClick={() => navigate("/notifications")}>Notifications</MobileItem>
+            <MobileItem onClick={() => navigate("/chat")}>Global Chat</MobileItem>
 
             <div className="mt-6">
               {isLoggedIn ? (
-                <MobileItem onClick={() => navigate("/profile")}>
-                  Profile
-                </MobileItem>
+                <MobileItem onClick={goToProfile}>Profile</MobileItem>
               ) : (
                 <button
                   onClick={() => navigate("/register")}
@@ -157,15 +154,16 @@ const Navbar = ({ isLoggedIn = false }) => {
 
 export default Navbar;
 
+/* ======================================================
+   SUB COMPONENTS
+   ====================================================== */
 
 const Logo = () => {
   const navigate = useNavigate();
-
   return (
     <button
       onClick={() => navigate("/")}
       className="px-3 text-sm font-semibold tracking-tight text-white hover:text-gray-200 transition"
-      style={{ fontFamily: "General Sans, sans-serif" }}
     >
       Cosmic Watch
     </button>
@@ -177,8 +175,7 @@ const NavItem = ({ label, onClick }) => (
     onClick={onClick}
     className="
       px-3 py-2
-      text-sm
-      font-semibold
+      text-sm font-semibold
       tracking-tight
       rounded-full
       text-[#CFCFCF]
@@ -197,8 +194,7 @@ const MobileItem = ({ children, onClick }) => (
     className="
       w-full py-4
       text-left
-      text-lg
-      font-semibold
+      text-lg font-semibold
       tracking-tight
       text-white
       border-b border-white/10
@@ -208,9 +204,7 @@ const MobileItem = ({ children, onClick }) => (
   </button>
 );
 
-const Divider = () => (
-  <div className="h-5 w-px bg-white/20" />
-);
+const Divider = () => <div className="h-5 w-px bg-white/20" />;
 
 const GetStarted = ({ onClick }) => (
   <button
@@ -218,8 +212,7 @@ const GetStarted = ({ onClick }) => (
     className="
       px-4 py-2
       rounded-full
-      text-sm
-      font-semibold
+      text-sm font-semibold
       tracking-tight
       bg-white text-black
       hover:bg-gray-200
@@ -238,8 +231,7 @@ const ProfileIcon = ({ onClick }) => (
       rounded-full
       bg-white/20
       flex items-center justify-center
-      text-sm
-      font-semibold
+      text-sm font-semibold
       tracking-tight
       text-white
       cursor-pointer
