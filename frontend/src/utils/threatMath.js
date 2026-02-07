@@ -14,12 +14,6 @@ const normalize = (value, min, max) =>
   return Math.round(score)
 }
 
-export function threatLevel(score) {
-  if (score >= 70) return "HIGH"
-  if (score >= 40) return "MEDIUM"
-  return "LOW"
-}
-
  export function threatLevel(score) {
   if (score >= 80) return "CRITICAL"
   if (score >= 60) return "HIGH"
