@@ -1,5 +1,6 @@
 //============//
-
+const dotenv= require('dotenv');
+dotenv.config();
 const {getAsteroidById} = require("./services/nasa.service.js"); //1
 const testNasa = async () => {
     try {
