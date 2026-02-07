@@ -17,7 +17,7 @@ export default function Threat() {
 
         const processed = data
           .filter(neo => neo.close_approach_data?.length)
-          .slice(0, 3)
+          .slice(0, 10)
           .map(neo => {
             const diameter =
               neo.estimated_diameter?.meters?.estimated_diameter_max ?? 0
