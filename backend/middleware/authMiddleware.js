@@ -25,10 +25,8 @@ const authMiddleware = (req,res,next)=>{
             message: "access denied"
         })
     }
-
-        next();
     }   
 } 
 
     
-module.exports= authMiddleware;
+module.exports= {protect:authMiddleware};
