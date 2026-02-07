@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/authContext"
+import { useAuth } from "@/context/authContext";
 import SignupForm from "@/components/signup-form";
 
 export default function Register() {
@@ -9,7 +9,11 @@ export default function Register() {
   const handleRegister = async (formData) => {
     try {
       await register(formData);
-      navigate("/login"); // backend does not return token
+
+      // ✅ Registration successful
+      // Backend does NOT return token, so user is not logged in yet
+      // Redirect to login (correct flow)
+      navigate("/login");
     } catch (err) {
       alert(err.message || "Registration failed");
     }

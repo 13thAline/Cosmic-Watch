@@ -1,6 +1,28 @@
-import { LoginForm } from "@/components/login-form"
+import { useNavigate } from "react-router-dom";
+import { LoginForm } from "@/components/login-form";
+import { useAuth } from "@/context/authContext";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const handleLogin = async (formData) => {
+    try {
+      const token = await login(formData);
+
+      // ✅ save token
+      localStorage.setItem("token", token);
+
+      // ✅ notify navbar (CRITICAL)
+      window.dispatchEvent(new Event("auth-change"));
+
+      // ✅ go to dashboard
+      navigate("/dashboard");
+    } catch (err) {
+      alert(err.message || "Login failed");
+    }
+  };
+
   return (
     <div className="grid min-h-svh lg:grid-cols-2 bg-black text-white">
 
@@ -18,7 +40,7 @@ export default function LoginPage() {
               to-[#FF6A2A]
               bg-clip-text text-transparent
             "
-            style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+            style={{ fontFamily: "Space Grotesk, sans-serif" }}
           >
             Cosmic Watch
           </span>
@@ -36,7 +58,8 @@ export default function LoginPage() {
               p-8
             "
           >
-            <LoginForm />
+            {/* 🔥 CONNECT FORM */}
+            <LoginForm onSubmit={handleLogin} />
           </div>
         </div>
 
@@ -70,5 +93,5 @@ export default function LoginPage() {
       </div>
 
     </div>
-  )
+  );
 }

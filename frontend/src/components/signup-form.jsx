@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,7 +31,7 @@ export default function SignupForm({ onSubmit, className }) {
 
     try {
       setLoading(true);
-      await onSubmit(formData); // 🔥 THIS connects to Register.jsx
+      await onSubmit(formData); // 🔥 connects to Register.jsx
     } catch (err) {
       setError(err.message || "Registration failed");
     } finally {
@@ -114,6 +115,22 @@ export default function SignupForm({ onSubmit, className }) {
       >
         {loading ? "Creating account..." : "Create Account"}
       </Button>
+
+      {/* ALREADY HAVE ACCOUNT */}
+      <p className="text-center text-sm text-gray-400">
+        Already have an account?{" "}
+        <Link
+          to="/login"
+          className="
+            text-[#FF6A2A]
+            font-medium
+            hover:underline
+            underline-offset-4
+          "
+        >
+          Sign in
+        </Link>
+      </p>
     </form>
   );
 }
