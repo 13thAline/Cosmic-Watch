@@ -6,6 +6,7 @@ import Notifications from "./pages/notifications";
 import Profile from "./pages/profile";
 import Register from "./pages/register";
 import Login from "./pages/login";
+import Chat from "./pages/Chat";
 
 function App() {
   const location = useLocation();
@@ -25,6 +26,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/chat" element={<Chat />} />
       </Routes>
     </div>
   );
