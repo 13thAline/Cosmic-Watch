@@ -1,36 +1,20 @@
 const mongoose = require('mongoose');
 
 const asteroidSchema = new mongoose.Schema({
-  nasaId: {
-    type: String,
-    required: true,
-    unique: true,
-    index: true,
-  },
-
+  nasaId: { type: String, required: true, unique: true, index: true },
   name: String,
 
-  diameterMeters: Number,
+  diameterMetersMax: Number, 
   velocityKph: Number,
   missDistanceKm: Number,
 
   closeApproachDate: Date,
+  isHazardous: { type: Boolean, default: false },
 
-  isHazardous: Boolean,
+  riskScore: { type: Number, index: true, default: 0 },
 
-  riskScore: {
-    type: Number,
-    index: true,
-  },
+  sourceTimestamp: Number, 
+  cachedAt: { type: Date, default: Date.now }
+}, { timestamps: true });
 
-  sourceTimestamp: Date, // NASA timestamp
-  cachedAt: {
-    type: Date,
-    default: Date.now,
-    index: true,
-  },
-}, {
-  timestamps: true,
-});
-
-module.exports= mongoose.model("Asteroid", asteroidSchema);
+module.exports = mongoose.model("Asteroid", asteroidSchema);
