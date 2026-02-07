@@ -29,8 +29,12 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.0",
+<<<<<<< HEAD
     "recharts": "^2.15.4",
     "sonner": "^2.0.7",
+=======
+    "socket.io-client": "^4.8.3",
+>>>>>>> c5af8521f4f24bead0518988b9e8bf0a512709ae
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
     "three": "^0.182.0",

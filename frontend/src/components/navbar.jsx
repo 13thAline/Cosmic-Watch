@@ -57,6 +57,8 @@ const Navbar = ({ isLoggedIn = false }) => {
             label="Notifications"
             onClick={() => navigate("/notifications")}
           />
+          {/* New Chat NavItem */}
+          <NavItem label="Global Chat" onClick={() => navigate("/chat")} /> 
 
           <Divider />
 
@@ -114,6 +116,10 @@ const Navbar = ({ isLoggedIn = false }) => {
             <MobileItem onClick={() => navigate("/notifications")}>
               Notifications
             </MobileItem>
+            {/* New Mobile Chat Item */}
+            <MobileItem onClick={() => navigate("/chat")}>
+              Global Chat
+            </MobileItem>
 
             <div className="mt-6">
               {isLoggedIn ? (
@@ -151,7 +157,6 @@ const Navbar = ({ isLoggedIn = false }) => {
 
 export default Navbar;
 
-/* ================= HELPER COMPONENTS ================= */
 
 const Logo = () => {
   const navigate = useNavigate();
