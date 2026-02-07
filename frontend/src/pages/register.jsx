@@ -1,6 +1,20 @@
-import SignupForm from "../components/signup-form";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/authContext"
+import SignupForm from "@/components/signup-form";
 
 export default function Register() {
+  const { register } = useAuth();
+  const navigate = useNavigate();
+
+  const handleRegister = async (formData) => {
+    try {
+      await register(formData);
+      navigate("/login"); // backend does not return token
+    } catch (err) {
+      alert(err.message || "Registration failed");
+    }
+  };
+
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-black">
 
@@ -48,7 +62,7 @@ export default function Register() {
               p-8
             "
           >
-            <SignupForm />
+            <SignupForm onSubmit={handleRegister} />
           </div>
         </div>
       </div>
@@ -71,7 +85,7 @@ export default function Register() {
           "
         />
 
-        {/* SOFT EDGE GRADIENT (ONLY AT SEAM) */}
+        {/* SOFT EDGE GRADIENT */}
         <div className="absolute inset-0 bg-gradient-to-l from-black/20 via-black/30 to-transparent" />
 
         {/* SUBTLE FIRE GLOW */}

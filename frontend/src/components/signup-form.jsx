@@ -1,44 +1,57 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
-export default function SignupForm() {
-  const navigate = useNavigate();
+export default function SignupForm({ onSubmit, className }) {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData); // backend hooks here
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // 🔴 critical
+    setError(null);
+
+    if (!formData.email || !formData.password) {
+      setError("Email and password are required");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await onSubmit(formData); // 🔥 THIS connects to Register.jsx
+    } catch (err) {
+      setError(err.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-sm space-y-6"
+      className={cn("w-full space-y-6 text-white", className)}
     >
-      {/* Heading */}
+      {/* HEADER */}
       <div className="space-y-1">
-        <h1 className="text-3xl font-semibold text-white">
-          Create account
-        </h1>
+        <h1 className="text-3xl font-semibold">Create account</h1>
         <p className="text-sm text-gray-400">
           Start monitoring near-Earth objects in real time.
         </p>
       </div>
 
-      {/* Email */}
+      {/* EMAIL */}
       <div className="space-y-2">
         <Label className="text-gray-300">Email</Label>
         <Input
@@ -48,11 +61,18 @@ export default function SignupForm() {
           value={formData.email}
           onChange={handleChange}
           required
-          className="bg-black/40 border-white/20 text-white focus:border-[#FF6A2A]"
+          className="
+            bg-black/40
+            border-white/20
+            text-white
+            placeholder:text-gray-500
+            focus:border-[#FF6A2A]
+            focus:ring-0
+          "
         />
       </div>
 
-      {/* Password */}
+      {/* PASSWORD */}
       <div className="space-y-2">
         <Label className="text-gray-300">Password</Label>
         <Input
@@ -62,13 +82,26 @@ export default function SignupForm() {
           value={formData.password}
           onChange={handleChange}
           required
-          className="bg-black/40 border-white/20 text-white focus:border-[#FF6A2A]"
+          className="
+            bg-black/40
+            border-white/20
+            text-white
+            placeholder:text-gray-500
+            focus:border-[#FF6A2A]
+            focus:ring-0
+          "
         />
       </div>
+
+      {/* ERROR */}
+      {error && (
+        <p className="text-sm text-red-400">{error}</p>
+      )}
 
       {/* CTA */}
       <Button
         type="submit"
+        disabled={loading}
         className="
           w-full
           bg-gradient-to-r
@@ -79,20 +112,8 @@ export default function SignupForm() {
           hover:opacity-90
         "
       >
-        Create Account
+        {loading ? "Creating account..." : "Create Account"}
       </Button>
-
-      {/* Footer */}
-      <p className="text-sm text-gray-400">
-        Already have an account?{" "}
-        <button
-          type="button"
-          onClick={() => navigate("/login")}
-          className="text-[#FFB089] hover:underline"
-        >
-          Sign in
-        </button>
-      </p>
     </form>
   );
 }
