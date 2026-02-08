@@ -5,6 +5,12 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+    restart: unless-stopped
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   redis:
     image: redis:alpine
@@ -13,6 +19,12 @@ services:
     volumes:
       - redis-data:/data
     command: redis-server --appendonly yes
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   backend:
     build: ./backend
@@ -24,8 +36,11 @@ services:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - NASA_API_KEY=${NASA_API_KEY}
     depends_on:
-      - mongodb
-      - redis
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
 
   frontend:
     build:
@@ -33,9 +48,10 @@ services:
       args:
         - VITE_API_URL=/api
     ports:
-      - "5173:80"
+      - "80:80"
     depends_on:
       - backend
+    restart: unless-stopped
 
 volumes:
   mongo-data:

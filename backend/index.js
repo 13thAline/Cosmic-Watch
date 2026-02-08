@@ -29,6 +29,15 @@ const alertRoutes = require("./routes/alertRoutes");
 
 app.use("/api/alerts", alertRoutes);
 
+// Health check endpoint for Docker
+app.get('/api/health', (req, res) => {
+    res.status(200).json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
+});
+
 
 
 io.on("connection", (socket) => {
