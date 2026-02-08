@@ -84,6 +84,7 @@ const Navbar = () => {
           <NavItem label="Threat Score" onClick={() => navigate("/threat")} />
           <NavItem label="Search" onClick={() => navigate("/notifications")} />
           <NavItem label="Global Chat" onClick={() => navigate("/chat")} />
+          <NavItem label="3D View" onClick={() => navigate("/control-center")} />
 
           <Divider />
 
