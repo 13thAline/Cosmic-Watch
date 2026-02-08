@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import Asteroid from "@/components/Asteroid";
+import Asteroid from "@/components/asteroid";
 
 const subtitleText =
   "Monitoring Near-Earth Objects with Precision & Real-Time Intelligence";
