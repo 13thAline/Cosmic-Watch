@@ -2,14 +2,14 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
 
-import Landing from "./pages/landing";
+import Landing from "./pages/Landing";
 import Dashboard from "./pages/dashboard";
 import Threat from "./pages/threat";
 import Notifications from "./pages/notifications";
 import Profile from "./pages/profile";
 import Register from "./pages/register";
 import Login from "./pages/login";
-import Chat from "./pages/Chat";
+import Chat from "./pages/chat";
 
 function App() {
   const location = useLocation();
