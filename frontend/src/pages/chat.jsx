@@ -3,9 +3,7 @@ import io from "socket.io-client";
 
 const socket = io.connect("http://localhost:5000");
 
-/* ======================================================
-   ASTEROID DATA + FACTS
-   ====================================================== */
+
 
 const ASTEROIDS = [
   {
@@ -38,9 +36,7 @@ const ASTEROID_FACTS = {
   ],
 };
 
-/* ======================================================
-   ASTEROID BOY SYSTEM MESSAGE
-   ====================================================== */
+
 
 function asteroidBoyIntro(asteroid) {
   if (asteroid.comingSoon) {
@@ -74,9 +70,7 @@ function asteroidBoyIntro(asteroid) {
   };
 }
 
-/* ======================================================
-   ASTEROID BOY CHATBOT LOGIC
-   ====================================================== */
+
 
 function asteroidBoyReply(text) {
   const msg = text.toLowerCase();
@@ -115,22 +109,18 @@ function asteroidBoyReply(text) {
   );
 }
 
-/* ======================================================
-   CHAT COMPONENT
-   ====================================================== */
+
 
 const Chat = () => {
   const [message, setMessage] = useState("");
   const [chatLog, setChatLog] = useState([]);
   const [activeAsteroid, setActiveAsteroid] = useState(ASTEROIDS[0]);
 
-  /* ---------- SWITCH ASTEROID ---------- */
   useEffect(() => {
     socket.emit("join_asteroid", activeAsteroid.id);
     setChatLog([asteroidBoyIntro(activeAsteroid)]);
   }, [activeAsteroid]);
 
-  /* ---------- RECEIVE MESSAGE ---------- */
   useEffect(() => {
     socket.on("receive_message", (data) => {
       setChatLog((prev) => [
@@ -151,7 +141,6 @@ const Chat = () => {
     return () => socket.off("receive_message");
   }, []);
 
-  /* ---------- SEND MESSAGE ---------- */
   const sendMessage = () => {
     if (!message.trim()) return;
 

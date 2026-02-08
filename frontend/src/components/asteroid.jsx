@@ -3,9 +3,7 @@ import { OrbitControls, useGLTF } from "@react-three/drei";
 import { useRef, useEffect } from "react";
 import * as THREE from "three";
 
-/* ======================================================
-   ASTEROID MODEL
-   ====================================================== */
+
 function AsteroidModel() {
   const ref = useRef();
   const { scene } = useGLTF("/asteroid.glb");
@@ -13,14 +11,11 @@ function AsteroidModel() {
   useEffect(() => {
     scene.traverse((child) => {
       if (child.isMesh && child.material) {
-        // 🪨 CLEAR, UNAMBIGUOUS GREY
         child.material.color = new THREE.Color("#9E9E9E");
 
-        // Very matte, rocky surface
         child.material.metalness = 0.02;
         child.material.roughness = 0.72;
 
-        // Neutral depth only (NO warmth)
         child.material.emissive = new THREE.Color("#0f0f0f");
         child.material.emissiveIntensity = 0.025;
 
@@ -29,7 +24,6 @@ function AsteroidModel() {
     });
   }, [scene]);
 
-  // Slow, steady rotation
   useFrame(() => {
     if (ref.current) {
       ref.current.rotation.y += 0.0018;
@@ -40,9 +34,7 @@ function AsteroidModel() {
   return <primitive ref={ref} object={scene} scale={1.12} />;
 }
 
-/* ======================================================
-   CANVAS
-   ====================================================== */
+
 export default function Asteroid() {
   return (
     <Canvas

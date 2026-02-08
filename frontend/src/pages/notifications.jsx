@@ -7,12 +7,10 @@ export default function AsteroidSearch() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
 
-  /* ---------- HELPERS ---------- */
   const isPastEvent = (date) => {
     return new Date(date) < new Date();
   };
 
-  /* ---------- SEARCH ---------- */
   const searchAsteroid = async () => {
     if (!query.trim()) return;
 
@@ -33,7 +31,6 @@ export default function AsteroidSearch() {
     }
   };
 
-  /* ---------- TRACK & ALERT ---------- */
   const trackAsteroid = async () => {
     if (isPastEvent(asteroid.closeApproachDate)) {
       setStatus("This asteroid has already passed Earth. Alerts are not generated for past events.");
@@ -185,7 +182,6 @@ export default function AsteroidSearch() {
   );
 }
 
-/* ---------- SMALL UI COMPONENT ---------- */
 function Data({ label, value, danger }) {
   return (
     <div>

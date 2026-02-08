@@ -2,7 +2,6 @@ const Asteroid = require("../models/asteroid");
 const nasaService = require("../services/nasa.service");
 const axios = require("axios");
 
-/* ---------- GET DAILY THREATS ---------- */
 const getThreats = async (req, res) => {
   try {
     const today = new Date().toISOString().split("T")[0];
@@ -25,7 +24,7 @@ const getThreats = async (req, res) => {
   }
 };
 
-/* ---------- SEARCH ASTEROID ---------- */
+
 const searchAsteroid = async (req, res) => {
   try {
     const { name } = req.query;
@@ -63,7 +62,7 @@ const searchAsteroid = async (req, res) => {
   }
 };
 
-/* ✅ EXPORT EVERYTHING TOGETHER */
+
 module.exports = {
   getThreats,
   searchAsteroid,

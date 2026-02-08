@@ -1,15 +1,11 @@
 const Alert = require("../models/Alert");
 
-/* ---------- helper ---------- */
 function daysBefore(date, days) {
   const d = new Date(date);
   d.setDate(d.getDate() - days);
   return d;
 }
 
-/* =========================================
-   TRACK ASTEROID → GENERATE ALERTS
-========================================= */
 exports.trackAsteroid = async (req, res) => {
   try {
     const {
@@ -49,10 +45,9 @@ exports.trackAsteroid = async (req, res) => {
     for (const s of schedules) {
       const triggerAt = daysBefore(closeApproachDate, s.days);
 
-      // ignore past alerts
+
       if (triggerAt < new Date()) continue;
 
-      // prevent duplicates
       const exists = await Alert.findOne({
         asteroidId,
         severity: s.severity,
@@ -86,9 +81,7 @@ exports.trackAsteroid = async (req, res) => {
   }
 };
 
-/* =========================================
-   GET ALERTS (for dashboard / notifications)
-========================================= */
+
 exports.getAlerts = async (req, res) => {
   try {
     const alerts = await Alert.find()
@@ -102,9 +95,7 @@ exports.getAlerts = async (req, res) => {
   }
 };
 
-/* =========================================
-   MARK ALERT AS READ
-========================================= */
+
 exports.markAsRead = async (req, res) => {
   try {
     await Alert.findByIdAndUpdate(

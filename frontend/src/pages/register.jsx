@@ -10,9 +10,7 @@ export default function Register() {
     try {
       await register(formData);
 
-      // ✅ Registration successful
-      // Backend does NOT return token, so user is not logged in yet
-      // Redirect to login (correct flow)
+
       navigate("/login");
     } catch (err) {
       alert(err.message || "Registration failed");

@@ -9,9 +9,6 @@ import {
   Bar
 } from "recharts";
 
-/* ======================================================
-   ACTIVITY TREND — LINE GRAPH
-   ====================================================== */
 export function ActivityTrend({ data }) {
   if (!data || !data.length) {
     return (
@@ -21,7 +18,6 @@ export function ActivityTrend({ data }) {
     );
   }
 
-  // sort by date
   const sorted = [...data].sort(
     (a, b) => new Date(a.date) - new Date(b.date)
   );
@@ -70,9 +66,7 @@ export function ActivityTrend({ data }) {
   );
 }
 
-/* ======================================================
-   MISS DISTANCE DISTRIBUTION — BAR GRAPH
-   ====================================================== */
+
 export function DistanceDistribution({ asteroids }) {
   if (!asteroids || !asteroids.length) {
     return (
