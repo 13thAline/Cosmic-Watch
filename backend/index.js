@@ -9,6 +9,7 @@ const cors = require("cors");
 const asteroidRouter = require('./routes/asteroidRouter.js');
 const ephemerisRouter = require('./routes/ephemerisRouter.js');
 
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -23,6 +24,11 @@ app.use(express.json());
 app.use('/api/auth', router);
 app.use('/api/asteroids', asteroidRouter);
 app.use('/api/ephemeris', ephemerisRouter);
+
+const alertRoutes = require("./routes/alertRoutes");
+
+app.use("/api/alerts", alertRoutes);
+
 
 
 io.on("connection", (socket) => {

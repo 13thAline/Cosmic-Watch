@@ -1,22 +1,44 @@
 const mongoose = require("mongoose");
 
-const alertSchema = new mongoose.Schema({
-  asteroidId: String,
-  asteroidName: String,
-  severity: {
-    type: String,
-    enum: ["info", "warning", "critical"],
+const alertSchema = new mongoose.Schema(
+  {
+    asteroidId: {
+      type: String,
+      required: true,
+    },
+    asteroidName: {
+      type: String,
+      required: true,
+    },
+    missDistanceKm: Number,
+
+    triggerAt: {
+      type: Date,
+      required: true,
+    },
+
+    severity: {
+      type: String,
+      enum: ["early", "monitor", "critical"],
+      required: true,
+    },
+
+    message: {
+      type: String,
+      required: true,
+    },
+
+    isSent: {
+      type: Boolean,
+      default: false,
+    },
+
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
   },
-  message: String,
-  missDistanceKm: Number,
-  isRead: {
-    type: Boolean,
-    default: false,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true }
+);
 
 module.exports = mongoose.model("Alert", alertSchema);

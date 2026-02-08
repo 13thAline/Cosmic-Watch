@@ -1,152 +1,200 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import axios from "axios";
 
-/* ---------- HELPERS ---------- */
-function formatTime(date) {
-  return new Date(date).toLocaleString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+export default function AsteroidSearch() {
+  const [query, setQuery] = useState("");
+  const [asteroid, setAsteroid] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("");
 
-const severityStyles = {
-  critical: "bg-red-500/10 border-red-500/30 text-red-400",
-  warning: "bg-orange-500/10 border-orange-500/30 text-orange-400",
-  info: "bg-white/5 border-white/20 text-white/80",
-};
+  const isPastEvent = (date) => {
+    return new Date(date) < new Date();
+  };
 
-/* ---------- MAIN ---------- */
-export default function Notification() {
-  const [alerts, setAlerts] = useState([]);
-  const [filter, setFilter] = useState("all");
-  const [loading, setLoading] = useState(true);
+  const searchAsteroid = async () => {
+    if (!query.trim()) return;
 
-  /* ---------- FETCH ALERTS ---------- */
-  useEffect(() => {
-    fetch("http://localhost:5000/api/alerts")
-      .then((res) => res.json())
-      .then((data) => {
-        setAlerts(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
-
-  /* ---------- MARK AS READ ---------- */
-  const markAsRead = async (id) => {
     try {
-      await fetch(`http://localhost:5000/api/alerts/${id}/read`, {
-        method: "PATCH",
-      });
+      setLoading(true);
+      setStatus("");
+      setAsteroid(null);
 
-      setAlerts((prev) =>
-        prev.map((a) =>
-          a._id === id ? { ...a, isRead: true } : a
-        )
+      const res = await axios.get(
+        `http://localhost:5000/api/asteroids/search?name=${query}`
       );
+
+      setAsteroid(res.data);
     } catch (err) {
-      console.error(err);
+      setStatus("No matching asteroid found.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  /* ---------- FILTERED ALERTS ---------- */
-  const filteredAlerts =
-    filter === "all"
-      ? alerts
-      : alerts.filter((a) => a.severity === filter);
+  const trackAsteroid = async () => {
+    if (isPastEvent(asteroid.closeApproachDate)) {
+      setStatus("This asteroid has already passed Earth. Alerts are not generated for past events.");
+      return;
+    }
+
+    try {
+      await axios.post("http://localhost:5000/api/alerts/track", asteroid);
+      setStatus("Early warnings scheduled for this asteroid.");
+    } catch {
+      setStatus("Failed to schedule alerts.");
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-black text-white px-6 pt-28 pb-12">
-
+    <div className="min-h-screen bg-black text-white px-6 pt-28 pb-20">
       {/* HEADER */}
-      <div className="mb-10">
+      <div className="max-w-3xl mx-auto mb-12">
         <h1 className="text-4xl font-semibold bg-gradient-to-r from-[#EDEDED] via-[#FFB089] to-[#FF6A2A] bg-clip-text text-transparent">
-          Notifications
+          Asteroid Intelligence
         </h1>
         <p className="text-white/60 mt-2">
-          System alerts and asteroid event updates
+          Search near-Earth objects and view approach intelligence.
         </p>
       </div>
 
-      {/* FILTER BAR */}
-      <div className="flex gap-3 mb-8">
-        {["all", "critical", "warning", "info"].map((type) => (
+      {/* SEARCH */}
+      <div className="max-w-3xl mx-auto mb-10">
+        <div className="flex gap-3">
+          <input
+            className="
+              flex-1
+              bg-black
+              border border-white/20
+              rounded-xl
+              px-5 py-3
+              outline-none
+              focus:border-[#FF6A2A]
+            "
+            placeholder="Search asteroid by name (e.g. Apollo)"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && searchAsteroid()}
+          />
+
           <button
-            key={type}
-            onClick={() => setFilter(type)}
-            className={`
-              px-4 py-2 rounded-full text-sm font-semibold
-              ${
-                filter === type
-                  ? "bg-orange-600 text-black"
-                  : "bg-white/10 hover:bg-white/20"
-              }
-            `}
+            onClick={searchAsteroid}
+            className="
+              px-6 py-3
+              rounded-xl
+              bg-[#FF6A2A]
+              text-black
+              font-semibold
+              hover:opacity-90
+            "
           >
-            {type.charAt(0).toUpperCase() + type.slice(1)}
+            {loading ? "Scanning…" : "Search"}
           </button>
-        ))}
+        </div>
       </div>
 
-      {/* ALERT LIST */}
-      <div className="space-y-4">
-        {loading && (
-          <p className="text-white/40">Loading notifications…</p>
-        )}
-
-        {!loading && filteredAlerts.length === 0 && (
-          <p className="text-white/40">
-            No notifications for this category
-          </p>
-        )}
-
-        {filteredAlerts.map((alert) => (
+      {/* ASTEROID CARD */}
+      {asteroid && (
+        <div className="max-w-3xl mx-auto mb-8">
           <div
-            key={alert._id}
-            className={`
-              rounded-2xl border p-5 transition
-              ${severityStyles[alert.severity]}
-              ${alert.isRead ? "opacity-60" : ""}
-            `}
+            className="
+              rounded-3xl
+              bg-white/5
+              backdrop-blur-xl
+              border border-white/15
+              p-8
+            "
           >
-            <div className="flex justify-between items-start gap-4">
-              <div>
-                <p className="text-sm uppercase tracking-wide opacity-70">
-                  {alert.severity}
+            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
+              {asteroid.name}
+              {isPastEvent(asteroid.closeApproachDate) && (
+                <span className="text-xs px-2 py-1 rounded-full bg-gray-500/20 text-gray-400">
+                  Past Event
+                </span>
+              )}
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
+              <Data
+                label="Closest Approach"
+                value={new Date(asteroid.closeApproachDate).toDateString()}
+              />
+              <Data
+                label="Miss Distance"
+                value={`${Number(asteroid.distanceKm).toLocaleString()} km`}
+              />
+              <Data
+                label="Velocity"
+                value={
+                  asteroid.velocity
+                    ? `${Number(asteroid.velocity).toLocaleString()} km/h`
+                    : "Data unavailable"
+                }
+              />
+              <Data
+                label="Hazard Status"
+                value={
+                  asteroid.hazardous
+                    ? "Potentially Hazardous"
+                    : "No Immediate Threat"
+                }
+                danger={asteroid.hazardous}
+              />
+            </div>
+
+            {/* ACTION / INFO */}
+            {isPastEvent(asteroid.closeApproachDate) ? (
+              <div className="mt-8 text-center">
+                <p className="text-orange-400 font-medium">
+                  Closest approach already occurred
                 </p>
-                <h3 className="text-lg font-semibold mt-1">
-                  {alert.asteroidName}
-                </h3>
-                <p className="text-sm mt-2 text-white/80">
-                  {alert.message}
-                </p>
-                <p className="text-xs text-white/40 mt-3">
-                  {formatTime(alert.createdAt)}
+                <p className="text-sm text-white/50 mt-1">
+                  No alerts are generated for past asteroid events.
                 </p>
               </div>
-
-              {!alert.isRead && (
-                <button
-                  onClick={() => markAsRead(alert._id)}
-                  className="
-                    text-xs px-3 py-1
-                    rounded-full
-                    bg-white/10
-                    border border-white/20
-                    hover:bg-white/20
-                  "
-                >
-                  Mark as read
-                </button>
-              )}
-            </div>
+            ) : (
+              <button
+                onClick={trackAsteroid}
+                className="
+                  mt-8
+                  w-full
+                  py-3
+                  rounded-xl
+                  bg-white
+                  text-black
+                  font-semibold
+                  hover:bg-gray-200
+                "
+              >
+                Track & Generate Alerts
+              </button>
+            )}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
+
+      {/* STATUS */}
+      {status && (
+        <p className="text-center text-white/70 mt-6">
+          {status}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function Data({ label, value, danger }) {
+  return (
+    <div>
+      <p className="text-xs uppercase tracking-wide text-white/40">
+        {label}
+      </p>
+      <p
+        className={`text-lg font-semibold mt-1 ${
+          danger ? "text-red-400" : ""
+        }`}
+      >
+        {value}
+      </p>
     </div>
   );
 }

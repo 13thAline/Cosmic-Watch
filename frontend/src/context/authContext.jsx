@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, [token]);
 
-  /* ================= LOGIN ================= */
+
   const login = async ({ email, password }) => {
     const res = await loginUser({ email, password });
 
@@ -27,18 +27,15 @@ export const AuthProvider = ({ children }) => {
       throw new Error(res.message || "Login failed");
     }
 
-    // ✅ SAVE TOKEN (single source of truth)
     localStorage.setItem("token", res.token);
     localStorage.setItem("user", JSON.stringify({ email }));
 
     setToken(res.token);
     setUser({ email });
 
-    // ✅ RETURN TOKEN (CRITICAL)
     return res.token;
   };
 
-  /* ================= REGISTER ================= */
   const register = async ({ email, password }) => {
     const res = await registerUser({ email, password });
 
@@ -47,14 +44,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  /* ================= LOGOUT ================= */
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setToken(null);
     setUser(null);
 
-    // notify navbar
     window.dispatchEvent(new Event("auth-change"));
   };
 

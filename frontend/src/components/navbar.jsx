@@ -82,7 +82,7 @@ const Navbar = () => {
 
           <NavItem label="Features" onClick={scrollToFeatures} />
           <NavItem label="Threat Score" onClick={() => navigate("/threat")} />
-          <NavItem label="Notifications" onClick={() => navigate("/notifications")} />
+          <NavItem label="Search" onClick={() => navigate("/notifications")} />
           <NavItem label="Global Chat" onClick={() => navigate("/chat")} />
 
           <Divider />
