@@ -5,7 +5,7 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(
-    localStorage.getItem("accessToken")
+    localStorage.getItem("token")
   );
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("user"))
@@ -19,32 +19,43 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, [token]);
 
-  // LOGIN
+  /* ================= LOGIN ================= */
   const login = async ({ email, password }) => {
     const res = await loginUser({ email, password });
 
-    if (!res.success) throw new Error(res.message);
+    if (!res.success) {
+      throw new Error(res.message || "Login failed");
+    }
 
-    localStorage.setItem("accessToken", res.accessToken);
+    // ✅ SAVE TOKEN (single source of truth)
+    localStorage.setItem("token", res.token);
     localStorage.setItem("user", JSON.stringify({ email }));
 
-    setToken(res.accessToken);
+    setToken(res.token);
     setUser({ email });
+
+    // ✅ RETURN TOKEN (CRITICAL)
+    return res.token;
   };
 
-  // REGISTER (no auto-login, backend doesn’t send token)
+  /* ================= REGISTER ================= */
   const register = async ({ email, password }) => {
     const res = await registerUser({ email, password });
 
-    if (!res.success) throw new Error(res.message);
-    // after register → redirect to login
+    if (!res.success) {
+      throw new Error(res.message || "Registration failed");
+    }
   };
 
+  /* ================= LOGOUT ================= */
   const logout = () => {
-    localStorage.removeItem("accessToken");
+    localStorage.removeItem("token");
     localStorage.removeItem("user");
     setToken(null);
     setUser(null);
+
+    // notify navbar
+    window.dispatchEvent(new Event("auth-change"));
   };
 
   return (

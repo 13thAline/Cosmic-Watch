@@ -9,6 +9,7 @@ export default function LoginPage() {
   const handleLogin = async (formData) => {
     try {
       const token = await login(formData);
+      console.log("LOGIN TOKEN:", token);
 
       // ✅ save token
       localStorage.setItem("token", token);

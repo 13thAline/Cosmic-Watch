@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -10,8 +10,24 @@ const Navbar = () => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
 
-  // ✅ AUTH STATE (single source of truth)
-  const isLoggedIn = Boolean(localStorage.getItem("token"));
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    Boolean(localStorage.getItem("token"))
+  );
+
+  // ✅ LISTEN FOR LOGIN / LOGOUT
+  useEffect(() => {
+    const syncAuth = () => {
+      setIsLoggedIn(Boolean(localStorage.getItem("token")));
+    };
+
+    syncAuth(); // initial check
+    window.addEventListener("auth-change", syncAuth);
+
+    return () => {
+      window.removeEventListener("auth-change", syncAuth);
+    };
+  }, []);
+
 
   /* ---------- SCROLL TO FEATURES ---------- */
   const scrollToFeatures = () => {
