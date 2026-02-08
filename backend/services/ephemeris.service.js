@@ -35,8 +35,7 @@ async function fetchAsteroidElements(designation) {
     try {
         const response = await axios.get(SBDB_API_URL, {
             params: {
-                sstr: designation,
-                'orbit-fmt': 'json'
+                sstr: designation
             },
             timeout: 10000
         });
@@ -47,27 +46,24 @@ async function fetchAsteroidElements(designation) {
             throw new Error(`No orbital data found for ${designation}`);
         }
 
+        // Elements come as an object with named keys in default format
         const elements = data.orbit.elements;
-        const findElement = (name) => {
-            const el = elements.find(e => e.name === name);
-            return el ? parseFloat(el.value) : null;
-        };
 
         return {
             designation: data.object?.des || designation,
             name: data.object?.fullname || designation,
             orbitalElements: {
-                semiMajorAxis: findElement('a'),      // AU
-                eccentricity: findElement('e'),
-                inclination: findElement('i'),         // degrees
-                longitudeAscNode: findElement('om'),   // degrees (Ω)
-                argPerihelion: findElement('w'),       // degrees (ω)
-                meanAnomaly: findElement('ma'),        // degrees
-                epoch: parseFloat(data.orbit.epoch)    // Julian Date
+                semiMajorAxis: parseFloat(elements.a) || null,      // AU
+                eccentricity: parseFloat(elements.e) || null,
+                inclination: parseFloat(elements.i) || null,         // degrees
+                longitudeAscNode: parseFloat(elements.om) || null,   // degrees (Ω)
+                argPerihelion: parseFloat(elements.w) || null,       // degrees (ω)
+                meanAnomaly: parseFloat(elements.ma) || null,        // degrees
+                epoch: parseFloat(data.orbit.epoch) || null          // Julian Date
             },
             orbitClass: data.object?.orbit_class?.name,
-            isNEO: data.object?.neo === true,
-            isPHA: data.object?.pha === true,
+            isNEO: data.object?.neo === true || data.object?.neo === 'Y',
+            isPHA: data.object?.pha === true || data.object?.pha === 'Y',
             absoluteMagnitude: data.object?.h ? parseFloat(data.object.h) : null,
             diameter: data.object?.diameter ? parseFloat(data.object.diameter) : null
         };

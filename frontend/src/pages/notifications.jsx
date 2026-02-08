@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "@/utils/api";
 
 export default function AsteroidSearch() {
   const [query, setQuery] = useState("");
@@ -19,13 +19,15 @@ export default function AsteroidSearch() {
       setStatus("");
       setAsteroid(null);
 
-      const res = await axios.get(
-        `http://localhost:5000/api/asteroids/search?name=${query}`
-      );
+      const res = await api.get(`/api/asteroids/search?name=${encodeURIComponent(query)}`);
 
       setAsteroid(res.data);
     } catch (err) {
-      setStatus("No matching asteroid found.");
+      if (err.response?.status === 404) {
+        setStatus("No matching asteroid found. Try searching by name (e.g., 'Apophis', 'Bennu') or designation (e.g., '99942').");
+      } else {
+        setStatus("Error searching asteroid database. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -38,7 +40,7 @@ export default function AsteroidSearch() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/alerts/track", asteroid);
+      await api.post("/api/alerts/track", asteroid);
       setStatus("Early warnings scheduled for this asteroid.");
     } catch {
       setStatus("Failed to schedule alerts.");
@@ -116,17 +118,21 @@ export default function AsteroidSearch() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
               <Data
                 label="Closest Approach"
-                value={new Date(asteroid.closeApproachDate).toDateString()}
+                value={asteroid.closeApproachDate
+                  ? new Date(asteroid.closeApproachDate).toDateString()
+                  : "Computing..."}
               />
               <Data
                 label="Miss Distance"
-                value={`${Number(asteroid.distanceKm).toLocaleString()} km`}
+                value={asteroid.distanceKm
+                  ? `${Number(asteroid.distanceKm).toLocaleString()} km`
+                  : "Computing..."}
               />
               <Data
                 label="Velocity"
                 value={
-                  asteroid.velocity
-                    ? `${Number(asteroid.velocity).toLocaleString()} km/h`
+                  asteroid.velocityKph
+                    ? `${Number(asteroid.velocityKph).toLocaleString()} km/h`
                     : "Data unavailable"
                 }
               />
@@ -139,6 +145,18 @@ export default function AsteroidSearch() {
                 }
                 danger={asteroid.hazardous}
               />
+              {asteroid.orbitClass && (
+                <Data
+                  label="Orbit Class"
+                  value={asteroid.orbitClass}
+                />
+              )}
+              {asteroid.diameterKm && (
+                <Data
+                  label="Diameter"
+                  value={`~${asteroid.diameterKm.toFixed(2)} km`}
+                />
+              )}
             </div>
 
             {/* ACTION / INFO */}
@@ -189,9 +207,8 @@ function Data({ label, value, danger }) {
         {label}
       </p>
       <p
-        className={`text-lg font-semibold mt-1 ${
-          danger ? "text-red-400" : ""
-        }`}
+        className={`text-lg font-semibold mt-1 ${danger ? "text-red-400" : ""
+          }`}
       >
         {value}
       </p>

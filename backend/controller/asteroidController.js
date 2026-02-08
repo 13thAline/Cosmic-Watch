@@ -29,36 +29,70 @@ const searchAsteroid = async (req, res) => {
   try {
     const { name } = req.query;
 
-    if (!name) {
+    if (!name || !name.trim()) {
       return res.status(400).json({ message: "Asteroid name required" });
     }
 
-    const response = await axios.get(
-      `https://api.nasa.gov/neo/rest/v1/neo/browse?api_key=${process.env.NASA_API_KEY}`
-    );
+    const query = name.trim();
+    const ephemerisService = require('../services/ephemeris.service');
 
-    const asteroid = response.data.near_earth_objects.find(a =>
-      a.name.toLowerCase().includes(name.toLowerCase())
-    );
+    // Use NASA SBDB API which has the complete catalog of 35,000+ NEOs
+    const asteroidData = await ephemerisService.fetchAsteroidElements(query);
 
-    if (!asteroid) {
+    if (!asteroidData) {
       return res.status(404).json({ message: "Asteroid not found" });
     }
 
-    const approach = asteroid.close_approach_data[0];
+    // Calculate close approach using orbital elements
+    const now = new Date();
+    const futureDate = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000); // 1 year ahead
+
+    let closestApproach = null;
+    try {
+      closestApproach = ephemerisService.findClosestApproach(
+        asteroidData.orbitalElements,
+        now,
+        futureDate
+      );
+    } catch (e) {
+      console.log('Could not calculate close approach:', e.message);
+    }
+
+    // Estimate diameter from absolute magnitude if not directly available
+    let diameterKm = asteroidData.diameter;
+    if (!diameterKm && asteroidData.absoluteMagnitude) {
+      // Approximation: D = 1329 * 10^(-H/5) / sqrt(albedo)
+      // Assuming average albedo of 0.14 for asteroids
+      const H = asteroidData.absoluteMagnitude;
+      diameterKm = (1329 / Math.sqrt(0.14)) * Math.pow(10, -H / 5);
+    }
 
     res.json({
-      name: asteroid.name,
-      hazardous: asteroid.is_potentially_hazardous_asteroid,
-      diameterKm:
-        asteroid.estimated_diameter.kilometers.estimated_diameter_max,
-      closeApproachDate: approach.close_approach_date,
-      distanceKm: approach.miss_distance.kilometers,
-      velocityKph: approach.relative_velocity.kilometers_per_hour,
+      name: asteroidData.name,
+      designation: asteroidData.designation,
+      hazardous: asteroidData.isPHA || false,
+      isNEO: asteroidData.isNEO || false,
+      diameterKm: diameterKm ? parseFloat(diameterKm.toFixed(3)) : null,
+      absoluteMagnitude: asteroidData.absoluteMagnitude,
+      orbitClass: asteroidData.orbitClass || null,
+      closeApproachDate: closestApproach?.date?.toISOString().split('T')[0] || null,
+      distanceKm: closestApproach?.distanceKm ? Math.round(closestApproach.distanceKm) : null,
+      distanceAU: closestApproach?.distanceAU ? parseFloat(closestApproach.distanceAU.toFixed(4)) : null,
+      velocityKph: closestApproach?.velocity?.relative
+        ? Math.round(Math.sqrt(
+          closestApproach.velocity.relative.vx ** 2 +
+          closestApproach.velocity.relative.vy ** 2 +
+          closestApproach.velocity.relative.vz ** 2
+        ) * 149597870.7 / 24) // AU/day to km/h
+        : null,
+      orbitalElements: asteroidData.orbitalElements
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "NASA API error" });
+    console.error('Search error:', err.message);
+    if (err.response?.status === 404 || err.message.includes('No orbital data')) {
+      return res.status(404).json({ message: "Asteroid not found in NASA database" });
+    }
+    res.status(500).json({ message: "Error searching asteroid database" });
   }
 };
 
