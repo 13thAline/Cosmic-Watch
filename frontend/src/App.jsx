@@ -10,13 +10,15 @@ import Profile from "./pages/profile";
 import Register from "./pages/register";
 import Login from "./pages/login";
 import Chat from "./pages/chat";
+import ControlCenter from "./pages/ControlCenter";
 
 function App() {
   const location = useLocation();
 
   const hideLayout =
     location.pathname === "/register" ||
-    location.pathname === "/login";
+    location.pathname === "/login" ||
+    location.pathname === "/control-center";
 
   return (
     <div className="min-h-screen flex flex-col bg-black text-white overflow-x-hidden">
@@ -33,6 +35,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/control-center" element={<ControlCenter />} />
         </Routes>
       </main>
 
@@ -43,3 +46,4 @@ function App() {
 }
 
 export default App;
+
